@@ -3,16 +3,10 @@ import sqlite3
 import base64
 import os
 import hashlib
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.fernet import Fernet
 
 def main():
 
-    hasher = hashlib.sha256()
-    hasher.update(input("Input your password ").encode()) # this is a bytes object
-    cpass = hasher.digest()
+    inpass = input("Input your password ").encode('utf-8')
 
     conn = sqlite3.connect('example.db')
     c = conn.cursor()
@@ -25,25 +19,30 @@ def main():
     row = c.fetchone()
     if (row is None):
         print("No valid database entry for input")
-    print(row)
-    
-    salt: bytes = os.urandom(16)
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=salt,
-        iterations=10000,
-        backend=default_backend()
+        raise RuntimeError("No valid database entry for input")
+
+    salt = row[1][:32]
+    key = row[1][32:]
+
+    checked_key = hashlib.pbkdf2_hmac(
+        'sha256',
+        inpass,
+        salt, 
+        100000
     )
 
-    key = base64.b64encode(kdf.derive(cpass))
+    if (key != checked_key):
+        print("Invalid password")
+        print(f"key: {key}")
+        print(f"checked_key: {checked_key}")
+        print(f"salt: {salt}")
+    else:
+        print("yay, they matched")
+        print(f"key: {key}")
+        print(f"checked_key: {checked_key}")
+        print(f"salt: {salt}")
 
-    f = Fernet(key)
-    encrypted = f.encrypt(input("Message to encrypt").encode())
-    print(encrypted)
-
-    decrypted = f.decrypt(encrypted)
-    print(decrypted)
+    
 
 
 
@@ -52,10 +51,16 @@ def main():
 
 if __name__ == "__main__":
     password = "asdf"
-    hasher = hashlib.sha256()
-    hasher.update(password.encode())
-    hashpass = hasher.digest().hex()
-
+    salt = os.urandom(32)
+    key = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        salt,
+        100000,
+    )
+    print(f"key: {key}")
+    print(f"salt: {salt}")
+    hashpass = salt + key
     wallet_name = "algorand wallet"
     seed_phrase = ["Hello", "how", "are", "you", "doing"]
     mnemonic = ':'.join(seed_phrase)
@@ -65,19 +70,27 @@ if __name__ == "__main__":
     additional = "Some other additional string information https://google.com heres a link"
     conn = sqlite3.connect('example.db')
     c = conn.cursor()
-    # c.execute(
-    #     '''
-    #         CREATE TABLE accounts
-    #         (application text, password text, mnemonic text, pin text, additional text)
-    #     '''
-    # )
+    c.execute(
+        '''
+            CREATE TABLE accounts
+            (application text, password text, mnemonic text, pin text, additional text)
+        '''
+    )
     c.execute(
         """
-            INSERT INTO accounts(application, password, mnemonic, pin, additional) VALUES
+            INSERT INTO accounts (application, password, mnemonic, pin, additional) VALUES
             (?, ?, ?, ?, ?);
         """,
         (wallet_name, hashpass, mnemonic, pin, additional)
     )
     conn.commit()
-    conn.close()
+    
     main()
+    c.execute(
+        """
+            DROP TABLE accounts
+        """
+    )
+    conn.commit()
+    conn.close()
+    
