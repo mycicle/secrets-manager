@@ -1,0 +1,45 @@
+Flows:
+
+    New User
+        Do you want to make a new account?
+        No:
+            Goodbye
+        Yes:
+            Username
+            Already Used:
+                Yes:
+                    Do you want to log in as that User
+                    Yes:
+                        Login
+                    No:
+                        Do you want to delete that users data and make a new user of that name
+                        Yes:
+                            Input password
+                            Correct
+                                Delete after confirmation
+                            Incorrect
+                                goto Already Used
+                        Do you want to choose a different username 
+                            yes:
+                                goto New Username
+                            no:
+                                goto Already Used
+                No:
+                    Input password
+                    Do you want brute force protection (user seeded salt)
+                    Create new db and private key for that user
+                    goto Add new Information
+
+    Returning User:
+        Login
+            Can go back to new user or keep trying
+        
+        Ask which information the user wants (list accounts) or show all
+        Ask if they want to add new information at top and bottom
+        Add new information: 
+            Everything gets a confirmation
+        
+
+        Information can optionally be stored with us encrypted and WE DONT KEEP THE KEYS 
+        it will be stored encrypted on the users disk along with the private key
+        
