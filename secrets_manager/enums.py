@@ -20,10 +20,3 @@ class BaseEnum(Enum):
         Return a list of the values stored within the enum
         """
         return set(item.value for item in cls)
-
-class UserType(BaseEnum):
-    """
-    Store user type, returning or new user
-    """
-    returning_user = 'returning_user'
-    new_user = 'new_user'
