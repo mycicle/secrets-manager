@@ -43,7 +43,7 @@ def initialize_new_user() -> None:
         """
     )
     c.execute(
-        f"""
+        """
             INSERT INTO accounts (password) VALUES
             (?)
         """,
