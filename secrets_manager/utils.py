@@ -3,6 +3,7 @@ from os.path import join
 from loguru import logger
 from typing import Dict, List
 
+from UserData import UserData
 
 def initialize_keypaths(base_keypath: str, base_datapath: str):
 
