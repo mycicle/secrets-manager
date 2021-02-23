@@ -1,6 +1,7 @@
 import os
 import sqlite3
 
+from Crypt import Crypt
 from KeyGen import KeyGen
 from UserData import UserData
 from user_operations import create_user
@@ -73,8 +74,11 @@ def new_user():
             create_user(username)
             break
 
-def returning_user():
-    (successful, key, username) = login(input("Input your username: "))
+def returning_user(username: str = None):
+    if username is None:
+        (successful, key, username) = login(input("Input your username: "))
+    else:
+        (successful, key, username) = login(username)
 
     if not successful:
         raise RuntimeError("An error was encountered during login")
@@ -172,7 +176,6 @@ def delete_user(username: str):
     return 
         
 
-
 def read_info(key: bytes, username: str):
     conn = sqlite3.connect(keypaths.get(username, None).datapath)
     c = conn.cursor()
@@ -190,6 +193,7 @@ def read_info(key: bytes, username: str):
         print("Database empty")
         return 
     else:
+        crypt: Crypt = Crypt(key)
         fields: Tuple[str] = (
             "application",
             "password",
@@ -199,7 +203,7 @@ def read_info(key: bytes, username: str):
         )
         for row in rows:
             for field, item in zip(fields, row):
-                print(f"{field}: {item}")
+                print(f"{field}: {crypt.decrypt(item)}")
             print()
 
     conn.close()
@@ -250,18 +254,23 @@ def write_info(key: bytes, username: str):
         """
     ))
 
+    crypt: Crypt = Crypt(key)
     c.execute(
         """
         INSERT INTO accounts (application, password, mnemonic, pin, additional) VALUES
         (?, ?, ?, ?, ?)
         """,
-        (application, application_password, mnemonic, pin, additional)
+        (crypt.encrypt(application), 
+         crypt.encrypt(application_password), 
+         crypt.encrypt(mnemonic), 
+         crypt.encrypt(pin), 
+         crypt.encrypt(additional))
     )
 
     conn.commit()
     conn.close()
     print("Information Successfully Stored!")
 
-def read_write_info(key: bytes, username: str):
+def read_and_write_info(key: bytes, username: str):
     read_info(key, username)
     write_info(key, username)

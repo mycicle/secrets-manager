@@ -24,14 +24,14 @@ def create_user(username: str):
         """
     )
     password: str = str(input("Please input your new user password for initialization: "))
-    while True:
-        check_password = input(f"Your password is: {password}\nEnter your password to confirm that you have it copied down correctly:\n  ")
-        if check_password == password:
-            print("Correct")
-            break
-        else:
-            print(f"Incorrect, the correct password is: \n{password}")
-            continue
+    # while True:
+    #     check_password = input(f"Your password is: {password}\nEnter your password to confirm that you have it copied down correctly:\n  ")
+    #     if check_password == password:
+    #         print("Correct")
+    #         break
+    #     else:
+    #         print(f"Incorrect, the correct password is: \n{password}")
+    #         continue
 
     key_generator: KeyGen = KeyGen()
     key, salt = key_generator.generate_new(password)

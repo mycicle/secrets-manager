@@ -14,8 +14,8 @@ class KeyGen:
         pass
     
     def generate_new(self, password: str) -> Tuple[bytes, bytes]:
-        # self.validate_password_format(password)
-        hashed_password: bytes = self.hash_password(password)
+        validated_password = self.validate_password_format(password)
+        hashed_password: bytes = self.hash_password(validated_password)
         salt = os.urandom(32)
 
         key = self._get_key(hashed_password, salt)
@@ -28,9 +28,19 @@ class KeyGen:
 
         return key
 
-    def validate_password_format(self, password: str) -> None:
-        self.check_format(password)
+    def validate_password_format(self, password: str) -> str:
+        while True:
+            proper_format = self.check_format(password)
+            if not proper_format:
+                print("Please use a different password")
+                password = input("Enter a new password: ")
+                continue
+            else:
+                break
+
         self.confirm(password)
+
+        return password
 
     def hash_password(self, password: str) -> bytes:
         hasher = hashlib.sha256()
@@ -39,12 +49,13 @@ class KeyGen:
 
         return hashed_password
 
-    def check_format(self, password: str) -> None:
+    def check_format(self, password: str) -> bool:
         regex = re.compile('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*]).{8,}$')
         result = re.match(regex, password)
 
         if result:
             print("Nice password")
+            return True
         else:
             print(
                 """
@@ -57,20 +68,21 @@ class KeyGen:
                     Should be longer than 8 characters
                 """
             )
-            raise ValueError("Bad password")
+            return False
     
     def confirm(self, password):
 
         correct = False
         while not correct:
             check = input("Please re enter your password: ")
+            print(password == check)
             if password != check:
                 continue
             else: 
                 correct = True
                 break
         
-        print("Password inputted correctly twice, make sure you remember it!")
+        print("Password input correctly, make sure you remember it!")
         print("If you lose it NOBODY can recover your data")
 
     @staticmethod
