@@ -1,0 +1,44 @@
+{
+  "name": "secrets-manager",
+  "version": "1.0.0",
+  "description": "A password and sensitive information manager which stores encrypted data locally on your disk",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "test": "jest --config jestconfig.json",
+    "build": "tsc && npm run format && npm run lint",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm ru nformat && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mycicle/secrets-manager.git"
+  },
+  "author": "Mycicle",
+  "license": "GPL-3.0-or-later",
+  "keywords": ["secret", "manager", "password", "encryption", "non-custodial"],
+  "bugs": {
+    "url": "https://github.com/mycicle/secrets-manager/issues"
+  },
+  "homepage": "https://github.com/mycicle/secrets-manager#readme",
+  "devDependencies": {
+    "prettier": "^2.2.1",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.2.2"
+  },
+  "dependencies": {
+    "@types/jest": "^26.0.20",
+    "D": "^1.0.0",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.2"
+  }
+}
