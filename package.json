@@ -10,7 +10,7 @@
   "scripts": {
     "test": "jest --config jestconfig.json",
     "build": "tsc && npm run format && npm run lint",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.tsx\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
@@ -24,13 +24,23 @@
   },
   "author": "Mycicle",
   "license": "GPL-3.0-or-later",
-  "keywords": ["secret", "manager", "password", "encryption", "non-custodial"],
+  "keywords": [
+    "secret",
+    "manager",
+    "password",
+    "encryption",
+    "non-custodial"
+  ],
   "bugs": {
     "url": "https://github.com/mycicle/secrets-manager/issues"
   },
   "homepage": "https://github.com/mycicle/secrets-manager#readme",
   "devDependencies": {
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.1",
     "prettier": "^2.2.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.2.2"
